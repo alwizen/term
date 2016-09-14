@@ -1,0 +1,35 @@
+# (this is recalculated every time the prompt is shown in function prompt_command):
+fill="--- "
+
+
+# \u@\h adalah username dan home sedangkan \w adalah directory yang dituju, kalian bisa merubah u& h sesuai keinginan kalian
+PS1="$status_style""$prompt_style"'${debian_chroot:+($debian_chroot)}┌─(\u@\h)-[\w]
+└───┤'"$command_style "
+
+# Reset color for command output
+# (this one is invoked every time before a command is executed):
+trap 'echo -ne "\e[0m"' DEBUG
+
+function prompt_command {
+
+    # create a $fill of all screen width minus the time string and a space:
+    let fillsize=${COLUMNS}-9
+    fill=""
+    while [ "$fillsize" -gt "0" ]
+    do
+        fill="-${fill}" # fill with underscores to work on 
+        let fillsize=${fillsize}-1
+    done
+
+    # If this is an xterm set the title to user@host:dir
+    case "$TERM" in
+    xterm*|rxvt*)
+        bname=`basename "${PWD/$HOME/~}"`
+        echo -ne "\033]0;${bname}: ${USER}@${HOSTNAME}: ${PWD/$HOME/~}\007"
+        ;;
+    *)
+        ;;
+    esac
+  
+}
+PROMPT_COMMAND=prompt_command
